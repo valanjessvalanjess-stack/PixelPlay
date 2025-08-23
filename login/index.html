@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PixelPlay – Kostenlose Browser‑Spiele</title>
+  <meta name="description" content="Eine einfache Spiele‑Sammlungs‑Website im Stil von Friv – nur mit HTML & CSS." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232a6ae9'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='56' font-family='Arial' fill='white'%3E%F0%9F%8E%AE%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root{
+      --bg: #0b1020;
+      --panel: #0f152b;
+      --panel-2: #121a37;
+      --text: #eaf0ff;
+      --muted: #a6b0d8;
+      --brand: #5c8cff;
+      --brand-2: #8f6cff;
+      --ring: 0 0 0 2px rgba(92, 140, 255, .35), 0 10px 30px rgba(0,0,0,.35);
+      --card-shadow: 0 8px 22px rgba(0,0,0,.35);
+      --radius: 20px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb; --panel:#ffffff; --panel-2:#f1f3fb; --text:#111424; --muted:#5c637a; --brand:#2a6ae9; --brand-2:#7a5cff;
+      }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(140, 132, 255, .15), transparent 60%),
+                  radial-gradient(1000px 500px at 110% 0%, rgba(45, 110, 255, .18), transparent 60%), var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit; text-decoration:none}
+
+    /* Header */
+    .header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(10,12,26,.75), rgba(10,12,26,.35));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .wrap{ max-width:1200px; margin:0 auto; padding:16px 20px; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .logo{
+      width:38px; height:38px; border-radius:12px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      display:grid; place-items:center;
+      box-shadow: var(--ring);
+    }
+    .logo::after{ content:"🎮"; font-size:20px; }
+    .title{ font-weight:800; letter-spacing:.3px; font-size:20px; }
+
+    /* Nav Pills */
+    .nav{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+    .pill{
+      padding:8px 14px; border-radius:999px; font-weight:600; font-size:14px; color:var(--text);
+      background:linear-gradient(180deg,var(--panel),var(--panel-2)); border:1px solid rgba(255,255,255,.06);
+      box-shadow: 0 2px 0 rgba(255,255,255,.06) inset, 0 8px 18px rgba(0,0,0,.25);
+      transition: transform .1s ease, box-shadow .2s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); box-shadow: var(--ring); }
+
+    /* Hero */
+    .hero{ padding:24px 20px 6px; }
+    .hero .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding:22px; box-shadow: var(--card-shadow);
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:20px;
+    }
+    @media (max-width:840px){ .hero .panel{ grid-template-columns:1fr; } }
+    .hero h1{ margin:0 0 8px; font-size: clamp(22px, 4.2vw, 36px); letter-spacing:.2px }
+    .hero p{ margin:0; color:var(--muted) }
+    .hero .cta{ display:flex; gap:12px; margin-top:14px }
+    .btn{
+      display:inline-block; padding:10px 16px; border-radius:14px; font-weight:700; border:1px solid rgba(255,255,255,.1);
+      background: linear-gradient(135deg, var(--brand), var(--brand-2)); color:white; box-shadow: var(--ring);
+    }
+    .btn.secondary{ background: linear-gradient(180deg, var(--panel), var(--panel-2)); color:var(--text); }
+
+    .promo{
+      border-radius:16px; position:relative; overflow:hidden; min-height:150px;
+      background: radial-gradient(200px 100px at 80% 0%, rgba(255,255,255,.15), transparent 60%),
+                  linear-gradient(135deg, rgba(92,140,255,.45), rgba(143,108,255,.35));
+    }
+    .promo img{ width:100%; height:100%; object-fit:cover; opacity:.7; display:block }
+
+    /* Section */
+    section{ padding: 22px 20px; }
+    .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin:0 auto 12px; max-width:1200px; }
+    .section-head h2{ margin:0; font-size: clamp(18px, 3.6vw, 26px); }
+    .muted{ color:var(--muted) }
+
+    /* Grid */
+    .grid{ max-width:1200px; margin:0 auto; display:grid; gap:16px; grid-template-columns: repeat(6, 1fr); }
+    @media (max-width:1200px){ .grid{ grid-template-columns: repeat(5, 1fr); } }
+    @media (max-width:1024px){ .grid{ grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width:840px){ .grid{ grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width:560px){ .grid{ grid-template-columns: repeat(2, 1fr); } }
+
+    .card{
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border:1px solid rgba(255,255,255,.06); border-radius:16px; overflow:hidden; position:relative;
+      box-shadow: var(--card-shadow); transition: transform .12s ease, box-shadow .2s ease;
+    }
+    .card:hover{ transform: translateY(-4px); box-shadow: 0 14px 40px rgba(0,0,0,.45); }
+    .thumb{ aspect-ratio: 16/10; position:relative; overflow:hidden; }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+    .badge{ position:absolute; left:10px; top:10px; padding:6px 10px; font-weight:800; font-size:12px; border-radius:999px; color:white; background:rgba(0,0,0,.25); backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,.25) }
+    .overlay{ position:absolute; inset:0; display:grid; place-items:center; background:linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.55)); opacity:0; transition:opacity .15s ease }
+    .card:hover .overlay{ opacity:1 }
+    .play{ background:white; color:#111; font-weight:900; padding:10px 14px; border-radius:12px; box-shadow: var(--ring) }
+
+    .meta{ padding:10px 12px 12px; display:flex; flex-direction:column; gap:4px }
+    .title{ font-weight:800 }
+    .tags{ display:flex; flex-wrap:wrap; gap:6px }
+    .tag{ font-size:12px; padding:4px 8px; background:rgba(255,255,255,.06); color:var(--muted); border-radius:999px; border:1px solid rgba(255,255,255,.08) }
+
+    /* Footer */
+    footer{ border-top:1px solid rgba(255,255,255,.06); margin-top:24px; }
+    .foot{ max-width:1200px; margin:0 auto; padding:18px 20px; color:var(--muted); font-size:14px; display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px }
+    .credits{ opacity:.8 }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title" aria-label="Seitentitel">PixelPlay</div>
+          <div class="muted" style="font-size:13px">Kostenlose Browser‑Spiele • HTML + CSS</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Kategorien">
+        <a class="pill" href="#alle">Alle</a>
+        <a class="pill" href="#action">Action</a>
+        <a class="pill" href="#puzzle">Puzzle</a>
+        <a class="pill" href="#rennen">Rennen</a>
+        <a class="pill" href="#sport">Sport</a>
+        <a class="pill" href="#kids">Kids</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero" id="alle">
+    <div class="wrap">
+      <div class="panel">
+        <div>
+          <h1>Spiele‑Sammlung im Friv‑Stil – schnell, hübsch, responsive.</h1>
+          <p>Nur HTML & CSS. Ersetze die Links/Thumbnails durch deine eigenen Spiele oder Seiten. Keine Skripte nötig.</p>
+          <div class="cta">
+            <a class="btn" href="#beliebt">Jetzt loslegen</a>
+            <a class="btn secondary" href="#anleitung">Anpassen</a>
+          </div>
+        </div>
+        <div class="promo" aria-hidden="true">
+          <img alt="Promo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='400'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%235c8cff'/%3E%3Cstop offset='1' stop-color='%238f6cff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1200' height='400' fill='url(%23g)'/%3E%3Ccircle cx='150' cy='230' r='80' fill='rgba(255,255,255,.28)'/%3E%3Crect x='340' y='60' width='520' height='280' rx='30' fill='rgba(255,255,255,.18)'/%3E%3Ctext x='600' y='230' text-anchor='middle' font-size='46' font-family='Arial' fill='white'%3EHTML %26 CSS SPIELEHUB%3C/text%3E%3C/svg%3E"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sektion: Beliebt / Alle -->
+  <section id="beliebt">
+    <div class="section-head">
+      <h2>Alle Spiele</h2>
+      <div class="muted">12 Einträge • Ersetze mit deinen eigenen</div>
+    </div>
+    <div class="grid">
+      <!-- Card Template: Duplizieren und Links/Bilder anpassen -->
+      <!-- 1 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Space Runner" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cdefs%3E%3ClinearGradient id='g1' x1='0' x2='1'%3E%3Cstop stop-color='%23111b4a'/%3E%3Cstop offset='1' stop-color='%23304bd1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='500' fill='url(%23g1)'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ESPACE RUNNER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Neu</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Space Runner</div>
+          <div class="tags"><span class="tag">Action</span><span class="tag">Arcade</span></div>
+        </div>
+      </a>
+      <!-- 2 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Block Logic" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%232654f6'/%3E%3Crect x='120' y='120' width='180' height='180' rx='16' fill='%23ffffff' opacity='.9'/%3E%3Crect x='350' y='220' width='180' height='120' rx='16' fill='%23ffffff' opacity='.7'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EBLOCK LOGIC%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Puzzle</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Block Logic</div>
+          <div class="tags"><span class="tag">Puzzle</span><span class="tag">Knobeln</span></div>
+        </div>
+      </a>
+      <!-- 3 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Street Racer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23ff7a18'/%3E%3Crect x='60' y='310' width='680' height='40' rx='20' fill='%23222222'/%3E%3Ccircle cx='300' cy='350' r='22' fill='white'/%3E%3Ccircle cx='500' cy='350' r='22' fill='white'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ESTREET RACER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Hot</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Street Racer</div>
+          <div class="tags"><span class="tag">Rennen</span><span class="tag">3D</span></div>
+        </div>
+      </a>
+      <!-- 4 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Goal Master" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2309c372'/%3E%3Ccircle cx='400' cy='250' r='90' fill='white'/%3E%3Ctext x='50%25' y='57%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EGOAL MASTER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Sport</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Goal Master</div>
+          <div class="tags"><span class="tag">Sport</span><span class="tag">Fußball</span></div>
+        </div>
+      </a>
+      <!-- 5 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Candy Swap" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23ff66b3'/%3E%3Ccircle cx='250' cy='240' r='62' fill='%23fff' opacity='.9'/%3E%3Ccircle cx='360' cy='300' r='50' fill='%23fff' opacity='.7'/%3E%3Ccircle cx='470' cy='230' r='58' fill='%23fff' opacity='.85'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ECANDY SWAP%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Süß</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Candy Swap</div>
+          <div class="tags"><span class="tag">Puzzle</span><span class="tag">Match‑3</span></div>
+        </div>
+      </a>
+      <!-- 6 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Farm Builder" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3ClinearGradient id='g2' x1='0' x2='1'%3E%3Cstop stop-color='%231e9b50'/%3E%3Cstop offset='1' stop-color='%2388d66c'/%3E%3C/linearGradient%3E%3Crect width='800' height='500' fill='url(%23g2)'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EFARM BUILDER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Neu</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Farm Builder</div>
+          <div class="tags"><span class="tag">Simulator</span><span class="tag">Kids</span></div>
+        </div>
+      </a>
+      <!-- 7 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Ninja Dash" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%232b2d42'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ENINJA DASH%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Action</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Ninja Dash</div>
+          <div class="tags"><span class="tag">Runner</span><span class="tag">Action</span></div>
+        </div>
+      </a>
+      <!-- 8 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Brain Pipes" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23294a66'/%3E%3Crect x='160' y='200' width='480' height='30' rx='10' fill='white'/%3E%3Crect x='380' y='140' width='30' height='220' rx='10' fill='white'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EBRAIN PIPES%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Puzzle</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Brain Pipes</div>
+          <div class="tags"><span class="tag">Puzzle</span><span class="tag">Rohre</span></div>
+        </div>
+      </a>
+      <!-- 9 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Drift City" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%230f2027'/%3E%3Crect x='100' y='360' width='600' height='36' rx='18' fill='%23ddd' opacity='.9'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EDRIFT CITY%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Rennen</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Drift City</div>
+          <div class="tags"><span class="tag">Rennen</span><span class="tag">Arcade</span></div>
+        </div>
+      </a>
+      <!-- 10 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Penalty Pro" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2300614e'/%3E%3Ccircle cx='400' cy='250' r='80' fill='%23fff' opacity='.9'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EPENALTY PRO%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Sport</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Penalty Pro</div>
+          <div class="tags"><span class="tag">Sport</span><span class="tag">Fußball</span></div>
+        </div>
+      </a>
+      <!-- 11 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Color Match" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23944bff'/%3E%3Ccircle cx='260' cy='260' r='70' fill='%23ffcc00'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ECOLOR MATCH%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Kids</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Color Match</div>
+          <div class="tags"><span class="tag">Kids</span><span class="tag">Lernen</span></div>
+        </div>
+      </a>
+      <!-- 12 -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Tower Defense" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%232b1742'/%3E%3Crect x='170' y='140' width='80' height='220' rx='10' fill='%23fff' opacity='.85'/%3E%3Crect x='300' y='200' width='80' height='160' rx='10' fill='%23fff' opacity='.85'/%3E%3Crect x='430' y='100' width='80' height='260' rx='10' fill='%23fff' opacity='.85'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ETOWER DEFENSE%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Strategie</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Tower Defense</div>
+          <div class="tags"><span class="tag">Strategie</span><span class="tag">Wellen</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Kategorie‑Abschnitte (Anker) -->
+  <section id="action">
+    <div class="section-head">
+      <h2>Action</h2>
+      <div class="muted">Schnell & aufregend</div>
+    </div>
+    <div class="grid">
+      <!-- Wiederverwendung – nimm beliebige Karten von oben in diese Sektion auf -->
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Ninja Dash" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%232b2d42'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ENINJA DASH%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Action</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Ninja Dash</div>
+          <div class="tags"><span class="tag">Runner</span><span class="tag">Action</span></div>
+        </div>
+      </a>
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Space Runner" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Cdefs%3E%3ClinearGradient id='g1b' x1='0' x2='1'%3E%3Cstop stop-color='%23111b4a'/%3E%3Cstop offset='1' stop-color='%23304bd1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='500' fill='url(%23g1b)'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ESPACE RUNNER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Neu</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Space Runner</div>
+          <div class="tags"><span class="tag">Action</span><span class="tag">Arcade</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="puzzle">
+    <div class="section-head">
+      <h2>Puzzle</h2>
+      <div class="muted">Denkkost</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Block Logic" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%232654f6'/%3E%3Crect x='120' y='120' width='180' height='180' rx='16' fill='%23ffffff' opacity='.9'/%3E%3Crect x='350' y='220' width='180' height='120' rx='16' fill='%23ffffff' opacity='.7'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EBLOCK LOGIC%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Puzzle</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Block Logic</div>
+          <div class="tags"><span class="tag">Puzzle</span><span class="tag">Knobeln</span></div>
+        </div>
+      </a>
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Brain Pipes" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23294a66'/%3E%3Crect x='160' y='200' width='480' height='30' rx='10' fill='white'/%3E%3Crect x='380' y='140' width='30' height='220' rx='10' fill='white'/%3E%3Ctext x='50%25' y='60%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EBRAIN PIPES%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Puzzle</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Brain Pipes</div>
+          <div class="tags"><span class="tag">Puzzle</span><span class="tag">Rohre</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="rennen">
+    <div class="section-head">
+      <h2>Rennen</h2>
+      <div class="muted">Schnell unterwegs</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Street Racer" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23ff7a18'/%3E%3Crect x='60' y='310' width='680' height='40' rx='20' fill='%23222222'/%3E%3Ccircle cx='300' cy='350' r='22' fill='white'/%3E%3Ccircle cx='500' cy='350' r='22' fill='white'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ESTREET RACER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Hot</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Street Racer</div>
+          <div class="tags"><span class="tag">Rennen</span><span class="tag">3D</span></div>
+        </div>
+      </a>
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Drift City" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%230f2027'/%3E%3Crect x='100' y='360' width='600' height='36' rx='18' fill='%23ddd' opacity='.9'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EDRIFT CITY%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Rennen</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Drift City</div>
+          <div class="tags"><span class="tag">Rennen</span><span class="tag">Arcade</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="sport">
+    <div class="section-head">
+      <h2>Sport</h2>
+      <div class="muted">Ball & mehr</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Goal Master" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2309c372'/%3E%3Ccircle cx='400' cy='250' r='90' fill='white'/%3E%3Ctext x='50%25' y='57%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EGOAL MASTER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Sport</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Goal Master</div>
+          <div class="tags"><span class="tag">Sport</span><span class="tag">Fußball</span></div>
+        </div>
+      </a>
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Penalty Pro" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2300614e'/%3E%3Ccircle cx='400' cy='250' r='80' fill='%23fff' opacity='.9'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EPENALTY PRO%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Sport</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Penalty Pro</div>
+          <div class="tags"><span class="tag">Sport</span><span class="tag">Fußball</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="kids">
+    <div class="section-head">
+      <h2>Kids</h2>
+      <div class="muted">Bunt & freundlich</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Color Match" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23944bff'/%3E%3Ccircle cx='260' cy='260' r='70' fill='%23ffcc00'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3ECOLOR MATCH%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Kids</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Color Match</div>
+          <div class="tags"><span class="tag">Kids</span><span class="tag">Lernen</span></div>
+        </div>
+      </a>
+      <a class="card" href="#" target="_blank" rel="noopener">
+        <div class="thumb">
+          <img alt="Farm Builder" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3ClinearGradient id='g2b' x1='0' x2='1'%3E%3Cstop stop-color='%231e9b50'/%3E%3Cstop offset='1' stop-color='%2388d66c'/%3E%3C/linearGradient%3E%3Crect width='800' height='500' fill='url(%23g2b)'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='42' font-family='Arial' fill='white'%3EFARM BUILDER%3C/text%3E%3C/svg%3E" />
+          <span class="badge">Neu</span>
+          <div class="overlay"><span class="play">Spielen</span></div>
+        </div>
+        <div class="meta">
+          <div class="title">Farm Builder</div>
+          <div class="tags"><span class="tag">Simulator</span><span class="tag">Kids</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Anleitung / Doku -->
+  <section id="anleitung">
+    <div class="section-head">
+      <h2>So passt du die Seite an</h2>
+      <div class="muted">Alles ohne JavaScript</div>
+    </div>
+    <div class="wrap" style="max-width: 1000px;">
+      <ol>
+        <li><strong>Bilder austauschen:</strong> Ersetze die <code>img src</code> Daten‑URLs (SVG‑Platzhalter) durch eigene Thumbnails (z. B. <code>img/thumbnails/deinspiel.jpg</code>).</li>
+        <li><strong>Links setzen:</strong> Ersetze in jeder <code>&lt;a class="card" href="#"&gt;</code> das <code>href</code> mit der URL zu deinem Spiel (<em>lokal</em> oder <em>extern</em>).</li>
+        <li><strong>Kategorien:</strong> Lege zusätzliche Sektionen wie oben an (z. B. <code>&lt;section id="strategie"&gt;</code>) und füge entsprechende Karten ein.</li>
+        <li><strong>Farben/Design:</strong> Ändere die CSS‑Variablen in <code>:root</code> (z. B. <code>--brand</code>, <code>--radius</code>), um den Look zu variieren.</li>
+        <li><strong>Barrierefreiheit:</strong> Verwende aussagekräftige <code>alt</code>‑Texte. Die Karte ist vollständig klickbar (Link umschließt die Karte).</li>
+        <li><strong>Responsiv:</strong> Das Grid passt sich automatisch an (6 → 2 Spalten). Thumbnails nutzen <code>aspect-ratio</code>.</li>
+        <li><strong>Ohne JS Filter:</strong> Die Kategorie‑Buttons springen zu den jeweiligen Abschnitten. Wenn du echte Filter/Suche willst, kannst du später mit JS nachrüsten.</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <div>© <span id="y">2025</span> PixelPlay</div>
+      <div class="credits">Design: HTML + CSS • Frei verwendbar</div>
+    </div>
+  </footer>
+</body>
+</html>
